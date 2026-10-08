@@ -1,0 +1,44 @@
+{
+  "uno_port": "AUTO",
+  "calibration_file": "calibration.uno.json",
+  "output_dir": "runs",
+  "material": "pending setup",
+  "specimen_id": "sample-01",
+  "trial_id": "trial-01",
+  "needle_id": "needle-01",
+  "needle_diameter_mm": null,
+  "needle_exposed_length_mm": null,
+  "insertion_depth_mm": null,
+  "material_thickness_mm": null,
+  "material_gsm": null,
+  "temperature_C": null,
+  "notes": "Set your motor port, calibration, and verified direction before a real test.",
+  "geometry": {
+    "force_model": "unknown",
+    "force_direction_deg": null,
+    "sensor_axis_deg": null,
+    "needle_angle_deg": null,
+    "contact_x_mm": null,
+    "contact_y_mm": null
+  },
+  "limits": {
+    "duration_s": 10.0,
+    "max_abs_sensor_force_N": null,
+    "sensor_stale_s": 0.5,
+    "max_motor_path_deg": null
+  },
+  "motor": {
+    "port": "/dev/cu.usbserial_REPLACE",
+    "id": 1,
+    "baudrate": 57600,
+    "model": "XL430-W250",
+    "rpm": 15.0,
+    "cw_sign": -1,
+    "direction_verified": false,
+    "mm_per_motor_rev": null
+  },
+  "load_cell_nominal_capacity_kg": 1,
+  "angle_definition": "Pending installed needle angle measured from rail",
+  "experiment_type": "rigid_needle_pull",
+  "engagement_level": null
+}

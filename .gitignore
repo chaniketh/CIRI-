@@ -6,3 +6,5 @@ runs/
 demo_runs/
 gui_demo_runs/
 calibration.rejected_*.json
+config.json
+calibration.uno.json

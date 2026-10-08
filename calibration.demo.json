@@ -1,0 +1,6 @@
+{
+  "counts_per_N": 10000,
+  "offset_counts": 100000,
+  "force_model": "unknown",
+  "setup_description": "SYNTHETIC DEMO ONLY; not a physical calibration."
+}

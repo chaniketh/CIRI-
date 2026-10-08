@@ -1,0 +1,43 @@
+{
+  "uno_port": "/dev/cu.usbmodem_REPLACE",
+  "calibration_file": "calibration.demo.json",
+  "output_dir": "demo_runs",
+  "material": "SIMULATED DEMO",
+  "specimen_id": "sample-01",
+  "trial_id": "trial-01",
+  "needle_id": "needle-01",
+  "needle_diameter_mm": null,
+  "needle_exposed_length_mm": null,
+  "insertion_depth_mm": null,
+  "material_thickness_mm": null,
+  "material_gsm": null,
+  "temperature_C": null,
+  "notes": "Record needle seating, material orientation, preload, and any slip/damage.",
+  "geometry": {
+    "force_model": "fixture_resultant",
+    "force_direction_deg": 0,
+    "sensor_axis_deg": null,
+    "needle_angle_deg": 52.4,
+    "contact_x_mm": null,
+    "contact_y_mm": null
+  },
+  "limits": {
+    "duration_s": 2,
+    "max_abs_sensor_force_N": 2,
+    "sensor_stale_s": 0.5,
+    "max_motor_path_deg": 15.0
+  },
+  "motor": {
+    "port": "/dev/cu.usbserial_REPLACE",
+    "id": 1,
+    "baudrate": 57600,
+    "model": "XL430-W250",
+    "rpm": 1.0,
+    "cw_sign": null,
+    "direction_verified": false,
+    "mm_per_motor_rev": null
+  },
+  "load_cell_nominal_capacity_kg": 1,
+  "angle_definition": "REPLACE: installed axis/chord/tip tangent relative to rail; do not infer from CAD complement alone",
+  "experiment_type": "rigid_needle_pull"
+}
