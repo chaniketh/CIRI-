@@ -1,7 +1,8 @@
 {
-  "counts_per_N": null,
-  "counts_per_gram": null,
-  "offset_counts": null,
+  "counts_per_N": 73375.585937,
+  "counts_per_gram": 719.568664,
+  "offset_counts": 22706.33,
   "force_model": "unknown",
-  "setup_description": "Enter your verified calibration constants; not calibrated yet."
+  "quality_status": "uno_verification_reported",
+  "setup_description": "User-supplied verified calibration for the existing load cell and HX711. Re-tare unloaded before every test. Recalibrate if the sensor, wiring, mounting, or load path changes."
 }
