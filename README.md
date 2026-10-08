@@ -8,6 +8,8 @@ The local working copy retains your rig configuration and calibration. GitHub in
 
 ## 1. Install once
 
+### macOS / Linux
+
 On macOS, install Python 3 if `python3 --version` does not work. Open Terminal in this repository:
 
 ```sh
@@ -24,6 +26,23 @@ python3 -m venv .venv
 ```
 
 No activation is required. Dependencies: pyserial, Dynamixel SDK, matplotlib.
+
+### Windows (PowerShell)
+
+Install Python 3, Git, and Arduino IDE. Open PowerShell and run:
+
+```powershell
+git clone https://github.com/chaniketh/CIRI-.git
+cd CIRI-
+py -3 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+if (!(Test-Path config.json)) { Copy-Item config.example.json config.json }
+if (!(Test-Path calibration.uno.json)) { Copy-Item calibration.example.json calibration.uno.json }
+```
+
+No environment activation or PowerShell execution-policy change is needed. The `.sh` scripts are for macOS/Linux; on Windows use the Python commands below. If `py` is unavailable but `python --version` shows Python 3, use `python -m venv .venv` instead.
+
+Before a real test, enter your calibration constants, motor COM port, and verified motor direction in the local JSON files. The templates are not a calibrated, verified rig.
 
 ## 2. Connect the hardware
 
@@ -44,13 +63,21 @@ The normal sketch streams `sequence,uno_ms,raw_counts,saturated` at 115200 baud.
 
 ## 3. Check ports and configuration
 
+macOS/Linux:
+
 ```sh
 .venv/bin/python -m serial.tools.list_ports -v
 ```
 
-The GUI detects the Uno automatically by USB identity, including changes to its `/dev/cu.usbmodem…` path. With one compatible board attached it is selected automatically. To select a particular Uno, add `uno_serial_number` to `config.json` using the port-list output. With multiple boards, use the correct serial number.
+Windows:
 
-The Dynamixel port is configured separately in `config.json` under `motor.port`. Use the device path shown by the port-list command. If it changes, update it before starting the server. Close Dynamixel Wizard to release that port.
+```powershell
+.\.venv\Scripts\python.exe -m serial.tools.list_ports -v
+```
+
+The GUI detects the Uno automatically by USB identity, including changes to its `/dev/cu.usbmodem…` path on macOS or `COM` number on Windows. With one compatible board attached it is selected automatically. To select a particular Uno, add `uno_serial_number` to `config.json` using the port-list output. With multiple boards, use the correct serial number.
+
+The Dynamixel port is configured separately in `config.json` under `motor.port`. Use the device path shown by the port-list command. If it changes, update it before starting the server. Close Dynamixel Wizard to release that port. On Windows, use a value such as `"COM5"` (replace it with the actual motor adapter port). The Uno and motor must have different ports. If either device is missing, check Windows Device Manager and install the manufacturer’s USB driver if needed.
 
 Optional read-only motor check:
 
@@ -58,15 +85,29 @@ Optional read-only motor check:
 .venv/bin/python identify_motor.py --port /dev/cu.usbserial_REPLACE --id 1 --baud 57600
 ```
 
-The saved direction is verified for this rig. If changing the drive or mounting, verify it unloaded before pulling:
+On Windows, the same read-only check is:
+
+```powershell
+.\.venv\Scripts\python.exe identify_motor.py --port COM5 --id 1 --baud 57600
+```
+
+Replace `COM5` with your actual motor port. The public template sets `direction_verified` to false. Verify direction unloaded before pulling:
 
 ```sh
 .venv/bin/python direction_check.py --config config.json --direction cw
 ```
 
+Windows unloaded jog:
+
+```powershell
+.\.venv\Scripts\python.exe direction_check.py --config config.json --direction cw
+```
+
 That command moves the motor slowly for a short jog. Set `cw_sign` and `direction_verified` in `config.json` only after confirming the intended cart direction.
 
 ## 4. Start and log
+
+macOS/Linux:
 
 ```sh
 ./start.sh
@@ -78,7 +119,13 @@ Equivalent command:
 .venv/bin/python web_gui.py --config config.json
 ```
 
-Open **http://127.0.0.1:8765/**. Keep Terminal and the page open.
+Windows:
+
+```powershell
+.\.venv\Scripts\python.exe web_gui.py --config config.json
+```
+
+Open **http://127.0.0.1:8765/**. Keep Terminal/PowerShell and the page open.
 
 1. Enter material, needle angle **from the horizontal rail**, and insertion level: on surface / in surface / deep into surface.
 2. With the needle clear of material, click **Tare sensor**. Wait for Ready.
@@ -94,7 +141,7 @@ Each test is saved automatically in `runs/<timestamp>/`:
 
 Use the ZIP download in the page's Test log to share a test. Negative force indicates the calibrated sensor sign; use its magnitude for peak comparisons. The logger leaves calculated needle-force components blank while the force model is unconfirmed.
 
-Stop the server with **Ctrl+C** in Terminal. Run `./start.sh` again to restart it. Do not run two servers/loggers against the same hardware.
+Stop the server with **Ctrl+C** in Terminal. Run `./start.sh` on macOS/Linux, or the Windows `web_gui.py` command above, to restart it. Do not run two servers/loggers against the same hardware.
 
 ## 5. Make a graph
 
@@ -102,6 +149,13 @@ Replace the timestamp below with the test folder you want:
 
 ```sh
 .venv/bin/python analyze.py runs/YOUR_TEST_TIMESTAMP --plot
+```
+
+Windows:
+
+```powershell
+.\.venv\Scripts\python.exe analyze.py runs\YOUR_TEST_TIMESTAMP --plot
+Get-ChildItem runs
 ```
 
 This writes analysis files and a force plot into that test folder. To list tests:
@@ -131,7 +185,7 @@ Substitute your actual measured masses. Check return to zero after unloading. Co
 
 ## Common fixes
 
-- **Site cannot be reached:** run `./start.sh`, leave Terminal open, then refresh the page.
+- **Site cannot be reached:** run the start command for your operating system, leave Terminal open, then refresh the page.
 - **Resource busy:** close Arduino Serial Monitor, Dynamixel Wizard, and other loggers.
 - **Uno port changed:** the GUI detects it automatically. Click Tare to connect.
 - **Device not configured / USB disconnected during a test:** finish the partial log, secure/reconnect USB, then tare and start a new test. It never resumes motion automatically.
@@ -145,4 +199,14 @@ Substitute your actual measured masses. Check return to zero after unloading. Co
 ./start.sh --config config.demo.json --demo --port 8766
 ```
 
+Windows:
+
+```powershell
+.\.venv\Scripts\python.exe -m unittest discover -s tests -q
+.\.venv\Scripts\python.exe web_gui.py --config config.demo.json --demo --port 8766
+```
+
 Open http://127.0.0.1:8766/ for simulated data. Demo logs are separate from real tests.
+
+Windows hardware operation has not yet been tested. The logger uses cross-platform Python and pyserial COM-port discovery; verify with the demo and an unloaded hardware test first.
+
