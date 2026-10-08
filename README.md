@@ -4,7 +4,7 @@
 
 Arduino Uno + HX711 load cell + USB Dynamixel. A local web page records force, material, needle angle, insertion level, and test outcome.
 
-The local working copy retains your rig configuration and calibration. GitHub includes templates; on a new computer, enter your verified calibration and motor port before a real test. Default pull: **10 seconds at about 15 rpm** (15.114 rpm in motor units), toward the motor. Force and angle stops are disabled. Sensor faults, USB faults, browser disconnection, and the motor watchdog still stop the test. Allow enough cart clearance for about 2.5 motor revolutions; disabling software limits does not increase the load cell's capacity.
+The setup includes your existing verified load-cell calibration. Recalibration is optional for the unchanged rig; set the motor port and verify its direction on the new computer. Default pull: **10 seconds at about 15 rpm** (15.114 rpm in motor units), toward the motor. Force and angle stops are disabled. Sensor faults, USB faults, browser disconnection, and the motor watchdog still stop the test. Allow enough cart clearance for about 2.5 motor revolutions; disabling software limits does not increase the load cell's capacity.
 
 ## 1. Install once
 
@@ -42,7 +42,7 @@ if (!(Test-Path calibration.uno.json)) { Copy-Item calibration.example.json cali
 
 No environment activation or PowerShell execution-policy change is needed. The `.sh` scripts are for macOS/Linux; on Windows use the Python commands below. If `py` is unavailable but `python --version` shows Python 3, use `python -m venv .venv` instead.
 
-Before a real test, enter your calibration constants, motor COM port, and verified motor direction in the local JSON files. The templates are not a calibrated, verified rig.
+The setup copies the supplied calibration constants automatically. Before a real test, set the motor COM port and verify motor direction in `config.json`. No calibration weights are needed for normal logging.
 
 ## 2. Connect the hardware
 
@@ -164,9 +164,43 @@ This writes analysis files and a force plot into that test folder. To list tests
 ls runs
 ```
 
-## Calibration
+## Existing calibration — ready to use
 
-Your local rig calibration is `calibration.uno.json`; it is excluded from GitHub. A fresh setup copies `calibration.example.json` to that filename. Fill its constants using the procedure below before running a real test. Every Tare sets a fresh unloaded zero for that test.
+`calibration.example.json` already contains your supplied verified values:
+
+| Setting | Value |
+| --- | ---: |
+| `counts_per_N` | 73375.585937 |
+| `counts_per_gram` | 719.568664 |
+| `offset_counts` | 22706.33 |
+
+The setup commands copy these into `calibration.uno.json`, which both Python loggers use through `config.json`. The Uno logging sketch sends raw counts; conversion to newtons happens in Python:
+
+```text
+Force_N = (raw_counts - session_tare_counts) / 73375.585937
+```
+
+Click **Tare sensor unloaded before every test**. This replaces the old offset for that run without changing the saved sensitivity. Tare is not a full recalibration. These constants apply to the same sensor, HX711, wiring, mounting, and load path; they do not establish a total needle-contact force for a different fixture geometry.
+
+If you previously copied the blank template, stop the logger and update your local calibration after `git pull`. Preserve any custom calibration first:
+
+Windows:
+
+```powershell
+if (Test-Path calibration.uno.json) { Copy-Item calibration.uno.json calibration.backup.json }
+Copy-Item calibration.example.json calibration.uno.json
+```
+
+macOS/Linux:
+
+```sh
+[ ! -f calibration.uno.json ] || cp calibration.uno.json calibration.backup.json
+cp calibration.example.json calibration.uno.json
+```
+
+## Recalibration (optional)
+
+Skip this section for the unchanged, calibrated rig. Use it if you replace the sensor/HX711, alter the mounting or load path, or verification no longer agrees with a known load.
 
 To recalibrate, upload `uno_calibrate/uno_calibrate.ino` in Arduino IDE. Open Serial Monitor at **115200 baud**, with **Newline** selected. Apply the known loads at the same needle contact point and in the test force direction. Include the hanger's mass. A weight placed elsewhere on the beam does not establish the needle-contact calibration.
 
@@ -209,4 +243,3 @@ Windows:
 Open http://127.0.0.1:8766/ for simulated data. Demo logs are separate from real tests.
 
 Windows hardware operation has not yet been tested. The logger uses cross-platform Python and pyserial COM-port discovery; verify with the demo and an unloaded hardware test first.
-
